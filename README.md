@@ -1,89 +1,103 @@
-Project Title: Predictive Maintenance for IoT Sensor Devices
-Objective: To build a machine learning model that predicts failure in IoT sensor devices using tabular time-series data, with special focus on class imbalance and feature engineering.
+# Predictive Maintenance for IoT Sensor Devices
 
-1. Understanding the Data
-The dataset consists of time-stamped IoT sensor readings capturing:
+## Objective
 
-Sensor Metrics: Temperature, Vibration, Signal_Strength, Runtime, etc.
+The goal of this project is to develop a machine learning model that predicts failures in IoT sensor devices using structured time-series data. The pipeline addresses the challenges of imbalanced data and leverages feature engineering to extract meaningful patterns for predictive modeling.
 
-Time Feature: Timestamp
+---
 
-Target Variable: Error_Code, where 1 indicates failure and 0 indicates normal operation.
+## 1. Data Overview
 
-2. Exploratory Data Analysis (EDA)
-A thorough EDA was performed to understand data characteristics:
+The dataset contains the following:
 
-Checked for missing values and data types.
+- **Sensor Features**: Voltage_Fluctuation, Signal_Strength, Runtime_Hours, Temperature, Vibration, etc.
+- **Timestamp**: Time of sensor reading
+- **Target Variable**: `Error_Code`
+  - `0` → Normal Operation
+  - `1` → Failure
 
-Analyzed class distribution — observed high class imbalance (very few positive failure cases).
+---
 
-Visualized correlations and distributions:
+## 2. Exploratory Data Analysis (EDA)
 
-No strong linear correlation found between numeric features.
+- Checked data types and missing values
+- Found high class imbalance (very few failure cases)
+- Correlation analysis revealed:
+  - Only `Voltage_Fluctuation`, `Signal_Strength`, and `Runtime_Hours` show weak correlation with the target
+  - No features clearly separate classes
+- Conclusion: Feature interactions may be non-linear; simple models may not perform well without engineering
 
-Feature distributions were visualized to understand spread and identify skewness.
+---
 
-3. Handling Class Imbalance
-Due to the rarity of failure events (Error_Code = 1), SMOTE (Synthetic Minority Oversampling Technique) was employed to oversample the minority class in the training data. This ensures the model doesn't become biased toward the majority class.
+## 3. Model 1 – Logistic Regression (Baseline)
 
-4. Feature Engineering
-To enhance model learning, domain-relevant features were created:
+- Applied Logistic Regression without feature engineering
+- High accuracy due to class imbalance
+- Poor performance for class `1` (minority):
+  - Low recall and F1-score
+  - Model biased toward predicting `0`
 
-Time-based Features:
+---
 
-Hour, DayOfWeek, IsWeekend derived from the timestamp.
+## 4. Handling Class Imbalance – SMOTE
 
-Rolling Statistics:
+- Applied **SMOTE** to oversample class `1` in the training set
+- Results:
+  - Class `1` recall and F1-score improved
+  - Overall accuracy dropped slightly
+  - Model now better recognizes failure cases
 
-3-point rolling means for Temperature, Vibration, and Signal_Strength.
+---
 
-Interaction Features:
+## 5. Feature Engineering
 
-Temp_x_Vibration: captures combined effect of two key metrics.
+Created features to enhance model learning:
 
-Signal_per_Runtime: signal normalized by operational time.
+- **Time-based Features**:
+  - `Hour`, `DayOfWeek`, `IsWeekend` derived from timestamp
+- **Rolling Statistics**:
+  - 3-point rolling mean for `Temperature`, `Vibration`, and `Signal_Strength`
+- **Interaction Features**:
+  - `Temp_x_Vibration` = Temperature × Vibration
+  - `Signal_per_Runtime` = Signal_Strength ÷ Runtime_Hours
 
-All features were selected to reflect real-world sensor behavior and potential early signs of failure.
+Feature engineering improved model interpretability and performance with SMOTE.
 
-5. Model Building
-Two classification models were used and compared:
+---
 
-Logistic Regression:
+## 6. Model 2 – Random Forest (Non-Linear)
 
-Trained both with and without SMOTE + Feature Engineering.
+- Used to capture complex non-linear interactions missed by Logistic Regression
+- Initial model gave average accuracy
+- Poor metrics for class `1`
 
-Performance compared using accuracy, recall, and F1-score.
+---
 
-Random Forest Classifier:
+## 7. Hyperparameter Tuning
 
-Trained on original (imbalanced) data.
+- Applied **GridSearchCV** to optimize Random Forest
+- Some improvement in class `1` metrics, but still underwhelming
+- Logistic Regression with feature engineering and SMOTE outperformed it
 
-Hyperparameters tuned using GridSearchCV.
+---
 
-Best model evaluated on the test set using classification metrics.
+## 8. Final Model Comparison
 
-6. Model Evaluation
-The final evaluation was conducted using:
+| Model                           | Accuracy | Class 1 Recall | Class 1 F1-Score |
+|--------------------------------|----------|----------------|------------------|
+| Logistic Regression (Base)     | High     | Low            | Low              |
+| Logistic + SMOTE               | Moderate | Slightly Better| Improved         |
+| Logistic + FE + SMOTE          | Lower    | Improved       | Better           |
+| Random Forest (Default)        | Average  | Poor           | Poor             |
+| Random Forest + GridSearchCV   | Moderate | Improved       | Still Low        |
 
-Confusion Matrix
+---
 
-Classification Report (Precision, Recall, F1-score for both classes)
+## Conclusion
 
-Accuracy Score
+- The best performing setup was **Logistic Regression** with **feature engineering and SMOTE**.
+- Despite its simplicity, the linear model performed better than Random Forest for the given data.
+- Feature engineering and proper class balancing had a greater impact than model complexity.
+- Future work could explore more complex feature transformations or time-aware models.
 
-This ensured that the model’s performance was validated from multiple perspectives, especially for the minority failure class.
-
-Conclusion
-The pipeline demonstrates a complete and systematic approach to predictive maintenance using machine learning on IoT data. The work includes:
-
-Robust preprocessing and exploration
-
-Handling of imbalanced classification using SMOTE
-
-Domain-specific feature engineering
-
-Comparison of linear and tree-based classifiers
-
-Hyperparameter tuning for performance optimization
-
-This approach ensures reliable early detection of device failure, supporting proactive maintenance strategies in IoT-enabled environments.
+---
