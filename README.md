@@ -101,3 +101,15 @@ Feature engineering improved model interpretability and performance with SMOTE.
 - Future work could explore more complex feature transformations or time-aware models.
 
 ---
+
+
+## how to deploy this model in a real-time monitoring system.
+
+- we can leverage different cloud providers to deploy this model in real-time monitoring system like (AWS, GCP)
+- At first we have to store the best model in Cloud storage like AWS S#.
+- for predicting new data outputs which are failure prediction.
+- We can use Apache Kafka for collecting real time sensor data of IoT devices and send it to subscribers.
+- this data then is processed with Apache Spark Streaming with transformations like feature engineering.
+- after transformation this data is proceeded to model for prediction.
+- if data is predicted as failure we can use AWS SNS sevice for notification.
+
