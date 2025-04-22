@@ -87,7 +87,7 @@ Feature engineering improved model interpretability and performance with SMOTE.
 |--------------------------------|----------|----------------|------------------|
 | Logistic Regression (Base)     | High     | Low            | Low              |
 | Logistic + SMOTE               | Moderate | Slightly Better| Improved         |
-| Logistic + FE + SMOTE          | Lower    | Improved       | Better           |
+| Logistic + FE + SMOTE          | Higher    | Improved       | Better           |
 | Random Forest (Default)        | Average  | Poor           | Poor             |
 | Random Forest + GridSearchCV   | Moderate | Improved       | Still Low        |
 
